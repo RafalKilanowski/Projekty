@@ -22,7 +22,7 @@ int lenght(const List * t);
 void append( List * t);
 void push(List * t);
 void display(List * t);
-void destroy(List * t);
+void destroy(List ** t);
 
 
 int main()
@@ -56,6 +56,12 @@ int main()
 			case 	'4' : 	{	printf("Number of items = %d\n",lenght(list1));
 								break;
 							}
+			
+			case 	'6' : 	{
+								destroy(&list1);
+								break;
+							}
+
 			default 	:	{ 	printf("Bad option, try once again\n");
 								break;
 							}
@@ -141,10 +147,15 @@ void append( List * t)
 
 void display(List * t)
 {
-	if(t->str==NULL)
+
+	if(t==NULL)
+	{
+		printf("No list is created!\n");
+	}
+	else if(t->str==NULL)
 	{
 		printf("List is empty!\n");
-	}
+	}	
 	else
 	{
 	List * temporary = t;
@@ -203,4 +214,28 @@ void push(List * t)
 	
 	number++;
 }	
+
+
+
+void destroy(List ** t)
+{
+	printf("Destroying list in process");
+	if(*t==0)
+	{
+		printf("There is no list!!\n");
+	}
+	else
+	{
+		while((*t)->next!=NULL)
+		{
+			*t=(*t)->next;
+			free((*t)->previous->str);
+			free((*t)->previous);
+			
+		}
+		free((*t)->str);
+		free(*t);
+		*t=NULL;
+	}	
+}
 
