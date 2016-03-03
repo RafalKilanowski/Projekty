@@ -1,2 +1,0 @@
-# Projekty
-Przykladowe programy

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #define 	BUFFER	100
-
+char 				temp 	[BUFFER];
 static 				int 				number = 0;
 
  struct List
@@ -11,19 +11,20 @@ static 				int 				number = 0;
 	
 	char 			* 	str;
 	struct List 	*   next;
-	struct List  	*	previous;
 };
 typedef struct List List;
 
-
+// List options //
 List * init();
-void show_menu();
 int lenght(const List * t);
 void append( List * t);
-void push(List * t);
+void push(List ** t);
 void display(List * t);
 void destroy(List ** t);
+char * pop(List **t,char *);
+void reverse (List ** t);
 
+void show_menu();
 
 int main()
 {
@@ -43,8 +44,7 @@ int main()
 								break;
 							}
 
-			case 	'2' : 	{  	push(list1);
-
+			case 	'2' : 	{  	push(&list1);
 								break;
 							}
 
@@ -56,7 +56,11 @@ int main()
 			case 	'4' : 	{	printf("Number of items = %d\n",lenght(list1));
 								break;
 							}
-			
+
+			case 	'5' : 	{	printf("Element = %s \bdeleted\n",pop(&list1,temp));
+								break;
+							}
+
 			case 	'6' : 	{
 								destroy(&list1);
 								break;
@@ -87,7 +91,7 @@ List * init()
 {
 	List * test = malloc(sizeof(List));
 	test->str=NULL;
-	test->next=test->previous=NULL;
+	test->next=NULL;
 	return test;
 }
 
@@ -104,6 +108,12 @@ int lenght(const List * t)
 
 void append( List * t)
 {
+	if(t==NULL)
+	{
+		printf("You destroyed whole list!\n");
+	}
+	else
+	{
 	char 	temp[BUFFER];
 	int 	temp1;
 
@@ -125,11 +135,8 @@ void append( List * t)
 		temp1=strlen(temp)+1;
 		create->str=malloc(sizeof(char)*temp1);
 		strcpy(create->str,temp);
-		create->previous=t;
 		t->next=create;
-		t->previous=create;
 		
-
 	}
 	else
 	{
@@ -137,12 +144,15 @@ void append( List * t)
 		temp1=strlen(temp)+1;
 		create->str=malloc(sizeof(char)*temp1);
 		strcpy(create->str,temp);
-		t->previous->next=create;
-		create->previous=t->previous;
-		t->previous=create;
+		while(t->next !=NULL)
+		{
+			t=t->next;
+		}
+		t->next=create;
 
 	}
 	number++;
+}
 }
 
 void display(List * t)
@@ -171,8 +181,15 @@ void display(List * t)
 }
 }
 
-void push(List * t)
+void push(List ** t)
 {
+	if(*t==NULL)
+	{
+		printf("You destroyed whole list!\n");
+	}
+	else
+	{
+
 	char 	temp[BUFFER];
 	int 	temp1;
 
@@ -184,58 +201,99 @@ void push(List * t)
 	{
 		
 		temp1=strlen(temp)+1;
-		t->str=malloc(sizeof(char)*temp1);
-		strcpy(t->str,temp);
+		(*t)->str=malloc(sizeof(char)*temp1);
+		strcpy((*t)->str,temp);
 		
 	}
-	else if (number==1)
+	else 
 	{
 		List * create = init();
 		temp1=strlen(temp)+1;
 		create->str=malloc(sizeof(char)*temp1);
-		create->previous=t;
-		t->next=create;
-		t->previous=create;
-		strcpy(create->str,t->str);
-		strcpy(t->str,temp);
-	}
-	else
-	{
-		List * create = init();
-		temp1=strlen(temp)+1;
-		create->str=malloc(sizeof(char)*temp1);
-		t->next->previous=create;
-		create->next=t->next;
-		create->previous=t;
-		t->next=create;
-		strcpy(create->str,t->str);
-		strcpy(t->str,temp);
+		strcpy(create->str,temp);
+		create->next=*t;
+		*t=create;	
 	}
 	
 	number++;
+}
 }	
 
 
 
 void destroy(List ** t)
 {
-	printf("Destroying list in process");
-	if(*t==0)
+	while(*t)
+		{
+			List * temporary = (*t)->next;
+			free((*t)->str);
+			free(*t);
+			*t=temporary;	
+		}
+	printf("List is empty now !\n");	
+		
+}
+
+char * pop(List **t,char * temp)
+{
+	List * temporary=(*t);
+	List * begin=(*t);
+	if(*t)
 	{
-		printf("There is no list!!\n");
+		if(temporary->next==NULL)
+		{
+			printf("The last element in the list\n");
+			if(temporary->str != NULL)
+			{
+			strcpy(temp,temporary->str);
+			free(temporary->str);
+			free(temporary);
+			*t=NULL;
+			number--;
+			return temp;
+			}
+			else
+			{
+				free(temporary);
+				*t=NULL;
+				temp="Brak";
+				number--;
+				return temp;
+			}
+		}
+		else
+		{
+		while(temporary->next!=NULL)
+			{
+				(*t)=temporary;
+				temporary=temporary->next;
+			}
+			strcpy(temp,temporary->str);
+			free(temporary->str);
+			free(temporary);
+			number--;
+			(*t)->next=NULL;
+			(*t)=begin;
+		}
 	}
 	else
 	{
-		while((*t)->next!=NULL)
-		{
-			*t=(*t)->next;
-			free((*t)->previous->str);
-			free((*t)->previous);
-			
-		}
-		free((*t)->str);
-		free(*t);
-		*t=NULL;
-	}	
+		printf("You can't pop empty list\n");
+		temp="Brak";
+	}
+
+	return temp;
 }
 
+void reverse (List ** t)
+{
+	List * temporary;
+	while((*t)->next !=NULL)
+	{
+		(*t)=(*t)->next;
+	}
+	
+
+
+
+}
