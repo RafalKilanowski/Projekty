@@ -15,14 +15,14 @@ static 				int 				number = 0;
 typedef struct List List;
 
 // List options //
-List * init();
-int lenght(const List * t);
-void append( List * t);
-void push(List ** t);
-void display(List * t);
-void destroy(List ** t);
-char * pop(List **t,char *);
-void reverse (List ** t);
+List * 	init();
+int 	lenght(const List * t);
+void 	append( List * t);
+void 	push(List ** t);
+void 	display(List * t);
+void 	destroy(List ** t);
+char 	* pop(List **t,char *);
+void 	reverse (List ** t);
 
 void show_menu();
 
@@ -66,6 +66,11 @@ int main()
 								break;
 							}
 
+			case 	'8' : 	{
+								reverse(&list1);
+								break;
+							}
+
 			default 	:	{ 	printf("Bad option, try once again\n");
 								break;
 							}
@@ -77,12 +82,6 @@ int main()
 		while(getchar()!='\n')
 				continue;
 	}
-
-
-
-	
-	
-
 	return 0;
 }
 
@@ -287,12 +286,21 @@ char * pop(List **t,char * temp)
 
 void reverse (List ** t)
 {
-	List * temporary;
-	while((*t)->next !=NULL)
+	if((*t)->next != NULL)
 	{
-		(*t)=(*t)->next;
+	List * temporary 	= (*t)->next;
+	List * temporary1	= (*t)->next;
+	(*t)->next=NULL;
+	while(temporary->next !=NULL)
+	{
+		temporary1=temporary1->next;
+		temporary->next=(*t);
+		(*t)=temporary;
+		temporary=temporary1;
 	}
-	
+	temporary->next=(*t);
+	(*t)=temporary;
+	}
 
 
 
