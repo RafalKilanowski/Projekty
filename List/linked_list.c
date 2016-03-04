@@ -229,6 +229,7 @@ void destroy(List ** t)
 			free(*t);
 			*t=temporary;	
 		}
+		(*t)=NULL;
 	printf("List is empty now !\n");	
 		
 }
@@ -286,7 +287,9 @@ char * pop(List **t,char * temp)
 
 void reverse (List ** t)
 {
-	if((*t)->next != NULL)
+	if((*t))
+	{
+		if((*t)->next)
 	{
 	List * temporary 	= (*t)->next;
 	List * temporary1	= (*t)->next;
@@ -303,5 +306,5 @@ void reverse (List ** t)
 	}
 
 
-
+}
 }
