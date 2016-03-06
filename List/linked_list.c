@@ -23,6 +23,7 @@ void 	display(List * t);
 void 	destroy(List ** t);
 char 	* pop(List **t,char *);
 void 	reverse (List ** t);
+void 	sort(List ** t);
 
 void show_menu();
 
@@ -70,6 +71,11 @@ int main()
 								reverse(&list1);
 								break;
 							}
+
+			case 	'9' : 	{
+								sort(&list1);
+								break;
+							}							
 
 			default 	:	{ 	printf("Bad option, try once again\n");
 								break;
@@ -304,7 +310,46 @@ void reverse (List ** t)
 	temporary->next=(*t);
 	(*t)=temporary;
 	}
-
-
 }
 }
+
+void	sort(List **t)
+{
+	List * temp = (*t);
+	List * temp2 = (*t);
+	List * previous;
+	int i=number;
+	int j=0;
+	for(i;i>0;i--)
+	{
+		for(j=0;j<i-1;j++)
+		{
+			if(strcmp(temp->str,temp->next->str)>0)
+			{
+				previous=temp2;
+				temp2=temp;
+				temp=temp->next;
+				temp2->next=temp->next;
+				temp->next=temp2;
+				
+				if(j==0)
+				(*t)=temp;
+				else
+				previous->next=temp;
+			}
+			else
+			{
+				previous=temp;
+				temp=temp->next;
+			}
+			
+		
+		}
+		temp=(*t);
+		
+	}
+	display((*t));
+}
+
+
+
