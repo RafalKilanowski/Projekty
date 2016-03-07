@@ -24,13 +24,14 @@ void 	destroy(List ** t);
 char 	* pop(List **t,char *);
 void 	reverse (List ** t);
 void 	sort(List ** t);
-
+List * 	clone(List * t);
 void show_menu();
 
 int main()
 {
 	char switch1;
 	List *  list1 = init();
+	List * clone1;
 	printf("What would you like to do with your list?\n");
 	show_menu();
 	scanf("%c",&switch1);
@@ -41,11 +42,13 @@ int main()
 
 		switch(switch1)
 		{
-			case 	'1' : 	{  	append(list1);
+			case 	'1' : 	{  
+								append(list1);
 								break;
 							}
 
-			case 	'2' : 	{  	push(&list1);
+			case 	'2' : 	{  	
+								push(&list1);
 								break;
 							}
 
@@ -67,10 +70,20 @@ int main()
 								break;
 							}
 
-			case 	'8' : 	{
-								reverse(&list1);
+			case 	'7' : 	{
+								clone1=clone(list1);
+								printf("Cloned list ->\n");
+								display(clone1);
+								destroy(&clone1);
 								break;
 							}
+			
+			case 	'8' : 	
+							{
+								reverse(&list1);	
+								break;			
+							}
+							
 
 			case 	'9' : 	{
 								sort(&list1);
@@ -88,6 +101,7 @@ int main()
 		while(getchar()!='\n')
 				continue;
 	}
+	destroy(&list1);
 	return 0;
 }
 
@@ -233,7 +247,8 @@ void destroy(List ** t)
 			List * temporary = (*t)->next;
 			free((*t)->str);
 			free(*t);
-			*t=temporary;	
+			*t=temporary;
+			number--;	
 		}
 		(*t)=NULL;
 	printf("List is empty now !\n");	
@@ -296,7 +311,9 @@ void reverse (List ** t)
 	if((*t))
 	{
 		if((*t)->next)
+
 	{
+	
 	List * temporary 	= (*t)->next;
 	List * temporary1	= (*t)->next;
 	(*t)->next=NULL;
@@ -311,45 +328,85 @@ void reverse (List ** t)
 	(*t)=temporary;
 	}
 }
+display((*t));
 }
 
 void	sort(List **t)
 {
-	List * temp = (*t);
-	List * temp2 = (*t);
-	List * previous;
-	int i=number;
-	int j=0;
-	for(i;i>0;i--)
+	if((*t))
 	{
-		for(j=0;j<i-1;j++)
+		List * temp = (*t);
+		List * temp2 = (*t);
+		List * previous;
+		int i=number;
+		int j=0;
+		for(i;i>0;i--)
 		{
-			if(strcmp(temp->str,temp->next->str)>0)
+			for(j=0;j<i-1;j++)
 			{
-				previous=temp2;
-				temp2=temp;
-				temp=temp->next;
-				temp2->next=temp->next;
-				temp->next=temp2;
-				
-				if(j==0)
-				(*t)=temp;
+				if(strcmp(temp->str,temp->next->str)>=0)
+				{
+					previous=temp2;
+					temp2=temp;
+					temp=temp->next;
+					temp2->next=temp->next;
+					temp->next=temp2;
+					if(j==0)
+					{	
+						(*t)=temp;
+						temp=temp2;
+						temp2=(*t);
+					}
+					else
+					{
+						previous->next=temp;
+						temp=temp2;
+						temp2=previous->next;
+					}
+				}
 				else
-				previous->next=temp;
+				{
+					temp2=temp;
+					temp=temp->next;
+				}
 			}
-			else
-			{
-				previous=temp;
-				temp=temp->next;
-			}
-			
-		
+			temp=(*t);
+			temp2=(*t);
 		}
-		temp=(*t);
-		
 	}
-	display((*t));
 }
 
+List * 	clone(List * t)
+{
+	int temp1;
+	List * new1 = init();
+	List * new2 = new1;
+	if(t)
+	{
+		temp1=strlen(t->str)+1;
+		new1->str=malloc(sizeof(char)*temp1);
+		strcpy(new1->str,t->str);
+		if(t->next != NULL)
+		{
+			t=t->next;
+			while(t->next !=NULL)
+			{
+				List * create = init();
+				temp1=strlen(t->str)+1;
+				create->str=malloc(sizeof(char)*temp1);
+				strcpy(create->str,t->str);
+				new1->next=create;
+				new1=new1->next;
+				t=t->next;
+			}
+		List * create = init();
+		temp1=strlen(t->str)+1;
+		create->str=malloc(sizeof(char)*temp1);
+		strcpy(create->str,t->str);
+		new1->next=create;
+		}
+	}
+	return new2;
+}
 
 
