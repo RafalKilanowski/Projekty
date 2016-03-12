@@ -2,34 +2,33 @@
 #include <math.h>
 #include "primlib.h"
 #define NUM_OF_VERT 5
-#define PI 			3.1415
-#define ANG_OF_ROT 	0.00001
-#define MAX_ANG		360
+#define ANG_OF_ROT 	0.001
+#define MAX_ANG		2*M_PI
 #define RADIUS		150
-#define ANGLE		2*PI/NUM_OF_VERT
+#define ANGLE		2*M_PI/NUM_OF_VERT
 #define X	screenWidth()/2 		// X center of rotpoly
-#define Y	screenHeight()/2		// Y center of rotpoly
+#define Y	screenHeight()/2+30		// Y center of rotpoly
 
 void draw_rotpoly(float rad,float temp_ang);
 int main()
 {
 	float temp_angle=0;
 	float rad=RADIUS;
-	float temporary =0.05;
+	float temporary =0.1;
 	initGraph();
 	while(pollkey()==(-1))
 	{
-		rad=rad+temporary;
+		/*rad=rad+temporary;
 		if(rad>200)
-			temporary =-0.05;
-		if(rad<130)
-			temporary=0.05;
+			temporary =-0.1;
+		else if(rad<100)
+			temporary=0.1;*/
 		temp_angle+=MAX_ANG*ANG_OF_ROT;
-		if(temp_angle>360)
-			temp_angle=temp_angle-360;
-		textout(screenWidth()/2.8,10,"FOR EXIT PRESS ANY KEY",2);
-		draw_rotpoly(rad,temp_angle);
-		SDL_Delay(0.4);
+		if(temp_angle>=MAX_ANG)
+			temp_angle=temp_angle-MAX_ANG;
+			
+			draw_rotpoly(rad,temp_angle);	
+			
 	}
 	return 0;
 }
@@ -43,5 +42,6 @@ void draw_rotpoly(float rad,float temp_ang)
 	
 	line(X+rad*cos(i*ANGLE+temp_ang),Y+rad*sin(i*ANGLE+temp_ang),X+rad*cos((i+1)*ANGLE+temp_ang),Y+rad*sin((i+1)*ANGLE+temp_ang),2);
 	}
+	textout(screenWidth()/3,10,"FOR EXIT PRESS ANY KEY",2);
 	updateScreen();
 }
