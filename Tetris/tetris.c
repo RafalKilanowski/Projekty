@@ -6,14 +6,37 @@
 #include "SDL/SDL.h"
 #include "primlib.h"
 
-#define 	WIDTH 	 		10 /* INITIAL WIDTH */
-#define 	HEIGHT			20 /* INITIAL HEIGHT */	
-#define 	BUCKET_WIDTH	3 /* WIDTH OF BUCKET FRAME */
-#define 	BLOCK_SIZE		20*20/HEIGHT /* THE SIZE OF EVERY BRICK ELEMENT */
-#define 	SPACE 			1
+#define 	HEIGHT				20/* INITIAL HEIGHT */	
+#define 	WIDTH 	 			10 /* INITIAL WIDTH */
+#define 	BUCKET_WIDTH		3 /* WIDTH OF BUCKET FRAME */
+#if HEIGHT<WIDTH
+#if WIDTH<10
+#define 	BLOCK_SIZE			((int) 20*15/WIDTH)
+#else
+#define 	BLOCK_SIZE			((int) 20*20/WIDTH)
+#endif
+#else
+#if HEIGHT<10
+#define 	BLOCK_SIZE			((int) 20*15/HEIGHT) /* THE SIZE OF EVERY BRICK ELEMENT */
+#else
+#define 	BLOCK_SIZE			((int) 20*20/HEIGHT) /* THE SIZE OF EVERY BRICK ELEMENT */
+#endif
+#endif
+#define 	SPACE 				1
+#define		TRUE				1
+#define		FALSE 				0
+#define 	NUMBER_OF_PIECES	7
+#define		NUMBER_OF_SHAPES	4
+#define		NUMBER_OF_COLORS	5
+#define 	EMPTY_PLACE			0
+
 static int factor = 1;
+static int points =0;
 const int x_p = 100;
 const int y_p = 50;
+#if (WIDTH<4 || HEIGHT <5 || WIDTH>30 || HEIGHT>40)
+	#error "The wrong dimensions of the game area"
+#endif
 
 void 	update_game(int game1[HEIGHT][WIDTH][3],char next_piece[4][4],int color);
 int 	check_if_poss(int game1[HEIGHT][WIDTH][3],int x, int y, char piece1[4][4], char move);
@@ -22,7 +45,6 @@ int 	play(int game1[HEIGHT][WIDTH][3],int x, int y,char piece2[4][4][4], int col
 void	delete_rows(int game1[HEIGHT][WIDTH][3]);
 void 	check_if_poss_rotation(int game1[HEIGHT][WIDTH][3],int *x,int *y,char piece1[4][4],char piece[4][4][4],int * random_piece_temp,int color);
 
-static int points =0;
 int main()
 {
 	/* SEED */
@@ -35,23 +57,24 @@ int main()
 		{
 			game[iterator1][iterator2][0]=x_p+iterator2*BLOCK_SIZE;
 			game[iterator1][iterator2][1]=y_p+iterator1*BLOCK_SIZE;
-			game[iterator1][iterator2][2]=0;
+			game[iterator1][iterator2][2]=EMPTY_PLACE;
 		}
 	}
-	int random_piece,random_piece2,random_color,random_next_piece,random_next_piece2,random_next_color;
+	int random_piece,random_piece2,random_color,random_next_piece,
+	random_next_piece2,random_next_color;
 	
-	random_piece=rand()%7;
-	random_piece2=rand()%4;
-	random_color=rand()%5+1;
+	random_piece=rand()%NUMBER_OF_PIECES;
+	random_piece2=rand()%NUMBER_OF_SHAPES;
+	random_color=rand()%NUMBER_OF_COLORS+1;
 
-	int play_bool = 1;
+	int play_bool = TRUE;
 	
 	initGraph();
 	while(play_bool)
 	{	
-		random_next_piece=rand()%7;
-		random_next_piece2=rand()%4;
-		random_next_color=rand()%6+1;
+		random_next_piece=rand()%NUMBER_OF_PIECES;
+		random_next_piece2=rand()%NUMBER_OF_SHAPES;
+		random_next_color=rand()%NUMBER_OF_COLORS+1;
 		update_game(game,pieces[random_next_piece][random_next_piece2],random_next_color);
 		usleep(100000);
 		if(check_if_poss(game,0,WIDTH/2-1,pieces[random_piece][random_piece2],'d'))
@@ -59,10 +82,10 @@ int main()
 			draw(game,0,WIDTH/2-1,pieces[random_piece][random_piece2],random_color);	
 		}
 		else
-			play_bool=0;
+			play_bool=FALSE;
 		if(play(game,0,WIDTH/2-1,pieces[random_piece],random_color,random_piece2) == 0)
 		{
-			play_bool = 0;
+			play_bool = FALSE;
 		}
 		delete_rows(game);
 		random_piece=random_next_piece;
@@ -87,7 +110,7 @@ void 	update_game(int game1[HEIGHT][WIDTH][3],char next_piece[4][4],int color)
 	{
 		for(iterator1=0;iterator1<WIDTH;iterator1++)
 		{
-			filledRect(game1[iterator][iterator1][0]+SPACE,game1[iterator][iterator1][1]+SPACE,game1[iterator][iterator1][0]+BLOCK_SIZE-2*SPACE,game1[iterator][iterator1][1]+BLOCK_SIZE-2*SPACE,game1[iterator][iterator1][2]);
+			filledRect(game1[iterator][iterator1][0]+SPACE,game1[iterator][iterator1][1]+SPACE,game1[iterator][iterator1][0]+BLOCK_SIZE-SPACE,game1[iterator][iterator1][1]+BLOCK_SIZE-SPACE,game1[iterator][iterator1][2]);
 		}
 	}
 	
@@ -121,11 +144,11 @@ void draw(int game1[HEIGHT][WIDTH][3],int x, int y,char piece1[4][4],int color)
 			if((int)piece1[iterator][iterator1] !=0)
 			{
 				if((int)piece1[iterator][iterator1] !=2)
-					filledRect(game1[x+iterator][y+iterator1][0]+SPACE,game1[x+iterator][y+iterator1][1]+SPACE,game1[x+iterator][y+iterator1][0]+BLOCK_SIZE-2*SPACE,game1[x+iterator][y+iterator1][1]+BLOCK_SIZE-2*SPACE,color);	
+					filledRect(game1[x+iterator][y+iterator1][0]+SPACE,game1[x+iterator][y+iterator1][1]+SPACE,game1[x+iterator][y+iterator1][0]+BLOCK_SIZE-SPACE,game1[x+iterator][y+iterator1][1]+BLOCK_SIZE-SPACE,color);	
 				else if(color == 0)
-					filledRect(game1[x+iterator][y+iterator1][0]+SPACE,game1[x+iterator][y+iterator1][1]+SPACE,game1[x+iterator][y+iterator1][0]+BLOCK_SIZE-2*SPACE,game1[x+iterator][y+iterator1][1]+BLOCK_SIZE-2*SPACE,color);	
+					filledRect(game1[x+iterator][y+iterator1][0]+SPACE,game1[x+iterator][y+iterator1][1]+SPACE,game1[x+iterator][y+iterator1][0]+BLOCK_SIZE-SPACE,game1[x+iterator][y+iterator1][1]+BLOCK_SIZE-SPACE,color);	
 				else
-					filledRect(game1[x+iterator][y+iterator1][0]+SPACE,game1[x+iterator][y+iterator1][1]+SPACE,game1[x+iterator][y+iterator1][0]+BLOCK_SIZE-2*SPACE,game1[x+iterator][y+iterator1][1]+BLOCK_SIZE-2*SPACE,1+color%6);
+					filledRect(game1[x+iterator][y+iterator1][0]+SPACE,game1[x+iterator][y+iterator1][1]+SPACE,game1[x+iterator][y+iterator1][0]+BLOCK_SIZE-SPACE,game1[x+iterator][y+iterator1][1]+BLOCK_SIZE-SPACE,1+color%6);
 			}
 		}
 	}
@@ -186,6 +209,7 @@ int 	play(int game1[HEIGHT][WIDTH][3],int x, int y,char piece2[4][4][4], int col
 							y++;
 							draw(game1,x,y,piece1,color);
 							updateScreen();
+							iterator++;
 						}
 						break;
 					}
@@ -198,6 +222,7 @@ int 	play(int game1[HEIGHT][WIDTH][3],int x, int y,char piece2[4][4][4], int col
 							y--;
 							draw(game1,x,y,piece1,color);
 							updateScreen();
+							iterator++;
 						}
 						break;
 					}
@@ -209,13 +234,17 @@ int 	play(int game1[HEIGHT][WIDTH][3],int x, int y,char piece2[4][4][4], int col
 							x++;
 							draw(game1,x,y,piece1,color);
 							updateScreen();
+							iterator = 10;
 						}
+
 						break;
 					}
 
 					case SDLK_SPACE :
 					{
 						check_if_poss_rotation(game1,&x,&y,piece1,piece2,&random_piece_temp,color);
+						iterator++;
+						
 						break;
 					}
 
