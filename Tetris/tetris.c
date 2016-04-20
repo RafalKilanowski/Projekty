@@ -3,7 +3,6 @@
 #include "pieces.h"
 #include <time.h>
 #include <unistd.h>
-#include "SDL/SDL.h"
 #include "primlib.h"
 
 #define 	HEIGHT				20/* INITIAL HEIGHT */	
