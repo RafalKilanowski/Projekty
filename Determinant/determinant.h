@@ -6,7 +6,20 @@
 #include <string.h>
 #include <stdbool.h>
 #include <math.h>
+#define NUM_OF_ALLOCS 10000
+int cnt = 0;
 
+static int is_error =1;
+
+void *my_alloc (unsigned int size)
+{
+	if (cnt < NUM_OF_ALLOCS)
+	{
+		cnt++;
+		return malloc(size);
+	}
+	return NULL;
+}
 
 bool is_number_valid(int temp_number)
 {
@@ -19,15 +32,15 @@ bool is_number_valid(int temp_number)
 double** allocate_matrix(int matrix_size)
 {
 		int i =0;
-		double** matrix = malloc(sizeof(double*)*(matrix_size));
+		double** matrix = my_alloc(sizeof(double*)*(matrix_size));
 		for(;i<matrix_size;i++)
 		{
-			matrix[i] = malloc(sizeof(double)*(matrix_size));
+			matrix[i] = my_alloc(sizeof(double)*(matrix_size));
 		}
 		return matrix;
 }
 
-void fill_array(double **matrix, int matrix_size)
+int fill_array(double **matrix, int matrix_size)
 {
 	int iterator1, iterator2;
 	int scanf_result;
@@ -36,10 +49,11 @@ void fill_array(double **matrix, int matrix_size)
 	{
 		for(iterator2=0;iterator2<matrix_size;iterator2++)
 		{
-			printf("Insert %d row and %d column\n",iterator1+1,iterator2+1);
 
 			while((!(scanf_result=scanf("%lf",&matrix[iterator1][iterator2])) || scanf_result ==EOF))
 			{
+				if(scanf_result ==EOF)
+					return 0;
 				while(getchar()!='\n')
 					continue;
 				printf("You have inserted inaproperiate value, try one more time\n");
@@ -47,6 +61,7 @@ void fill_array(double **matrix, int matrix_size)
 		}
 
 	}
+return 1;
 }
 
 
@@ -64,29 +79,53 @@ void show_array(double **matrix, int matrix_size1)
 	}
 
 }
+void fre (double ** matrix,int matrix_size)
+{	
+	int i;
+	for(i=0;i<matrix_size;i++)
+	{
+		free(matrix[i]);
+	}
+	free(matrix);
+}
 
 double calculate_determinant(double **matrix,int matrix_size)
 {
 	double determinant=0;
 	int i,j,k;
+	int mall_check=1;
 	if(matrix_size == 2)
 	{
 		determinant=matrix[0][0]*matrix[1][1]-matrix[0][1]*matrix[1][0];
-		
 		return determinant;
 	}
 	else
 	{
 		
 		
-		double** temp_matrix = malloc(sizeof(double*)*(matrix_size-1));
+		double** temp_matrix = NULL;
+		if((temp_matrix=my_alloc(sizeof(double*)*(matrix_size-1))) == NULL)
+		{
+			is_error=0;
+			return 0;
+		}
+
 		for(i=0;i<matrix_size-1;i++)
 		{
 			
-			temp_matrix[i]= malloc(sizeof(double)*(matrix_size-1));
+			if((temp_matrix[i]= my_alloc(sizeof(double)*(matrix_size-1))) != NULL)
 			memset(*(&temp_matrix[i]),0,sizeof(double)*(matrix_size-1));
-			
+			else
+			{
+				is_error=0;
+				mall_check=0;
+				fre(temp_matrix,i);
+				return 0;
+			}
+				
 		}
+		if(mall_check == 1)
+		{
 		for(i=0;i<matrix_size;i++) {
 
 			for(j=1;j<matrix_size;j++) {
@@ -103,8 +142,30 @@ double calculate_determinant(double **matrix,int matrix_size)
 			}
 			determinant=determinant+matrix[0][i]*pow((-1),(2+i))*calculate_determinant(temp_matrix,matrix_size-1);
 		}
+		
+		fre(temp_matrix,matrix_size-1);
 		return determinant;
+		}
+		else
+		{
+			for(i=0;i<mall_check;i++)
+			{	
+				free(temp_matrix[i]);
+			}
+			free(temp_matrix);
+			return 0;
+		}
+		
 	}
 }
+
+void print_result(double det)
+{
+	if(is_error == 1)
+	printf("Determinant is equal = %lf\n",det);
+	else
+	printf("Error when allocating memory!\n");
+}
+
 
 #endif
